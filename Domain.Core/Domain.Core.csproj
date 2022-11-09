@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="AutoMapper" Version="12.0.0" />
+      <PackageReference Include="Grpc.AspNetCore" Version="2.49.0" />
+      <PackageReference Include="Grpc.Tools" Version="2.50.0">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+    </ItemGroup>
+    
+    <ItemGroup>
+        <Protobuf Include="..\Domain\Protos\greet.proto" GrpcService="Server" Link="Protos\greet.proto" />
+        <Protobuf Include="..\Domain\Protos\crud.proto" GrpcService="Server" Link="Protos\crud.proto" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Content Include="..\Domain\Protos\crud.proto">
+        <Link>Protos\crud.proto</Link>
+      </Content>
+    </ItemGroup>
+
+</Project>
