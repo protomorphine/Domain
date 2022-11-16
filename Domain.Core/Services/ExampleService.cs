@@ -4,6 +4,7 @@ using Domain.Core.Extensions;
 using Domain.Core.Repositories;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using Microsoft.Extensions.Logging;
 
 namespace Domain.Core.Services;
 
@@ -21,6 +22,8 @@ public class ExampleService : Example.ExampleBase
     /// </summary>
     private readonly IMapper _mapper;
 
+    private readonly ILogger<ExampleService> _logger;
+
     #endregion
 
     #region Constructors
@@ -30,10 +33,12 @@ public class ExampleService : Example.ExampleBase
     /// </summary>
     /// <param name="exampleEntityRepository">repository to work with <see cref="ExampleEntity"/></param>
     /// <param name="mapper">mapper</param>
-    public ExampleService(IExampleEntityRepository exampleEntityRepository, IMapper mapper)
+    /// <param name="logger">logger</param>
+    public ExampleService(IExampleEntityRepository exampleEntityRepository, IMapper mapper, ILogger<ExampleService> logger)
     {
         _exampleEntityRepository = exampleEntityRepository;
         _mapper = mapper;
+        _logger = logger;
     }
 
     #endregion
@@ -50,6 +55,9 @@ public class ExampleService : Example.ExampleBase
     {
         var entity = _mapper.Map<ExampleEntity>(request);
         await _exampleEntityRepository.CreateAsync(entity);
+
+        _logger.LogInformation("Entity with id {Id} was successfully created", entity!.Id);
+
         return _mapper.Map<ExampleEntityDto>(entity);
     }
 
@@ -68,6 +76,8 @@ public class ExampleService : Example.ExampleBase
         var updated = _mapper.Map(request, entity);
 
         await _exampleEntityRepository.UpdateAsync(updated!);
+
+        _logger.LogInformation("Entity with id {Id} was successfully updated", entity!.Id);
 
         return _mapper.Map<ExampleEntityDto>(updated);
     }
@@ -97,7 +107,7 @@ public class ExampleService : Example.ExampleBase
     {
         var entities = await _exampleEntityRepository.GetAllAsync();
 
-        var reply = new EntityListDto();
+        var reply = new EntityListDto {Count = await _exampleEntityRepository.GetCount()};
         reply.Entities.AddRange(entities.Select(it => _mapper.Map<ExampleEntityDto>(it)));
         return reply;
     }
@@ -115,6 +125,8 @@ public class ExampleService : Example.ExampleBase
         entity.ThrowRpcEntityNotFoundIfNull($"Entity with id = {request.Value} not found.");
 
         await _exampleEntityRepository.DeleteAsync(entity!);
+
+        _logger.LogInformation("Entity with id {Id} was successfully deleted", entity!.Id);
 
         return new Empty();
     }
