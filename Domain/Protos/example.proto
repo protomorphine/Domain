@@ -1,0 +1,49 @@
+﻿syntax = "proto3";
+
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/empty.proto";
+
+option csharp_namespace = "Domain.Core.Services";
+
+package example;
+
+service Example {
+  rpc CreateAsync (CreateDto) returns (ExampleEntityDto);
+  rpc GetAsync (GetEntity) returns (ExampleEntityDto);
+  rpc GetAllAsync (GetAll) returns (EntityListDto);
+  rpc UpdateAsync (UpdateDto) returns (ExampleEntityDto);
+  rpc DeleteAsync (DeleteDto) returns (google.protobuf.Empty);
+}
+
+message CreateDto {
+  string name = 1;
+  string content = 2;
+}
+
+message GetEntity {
+  int64 id = 1;
+}
+
+message GetAll {}
+
+message EntityListDto {
+  repeated ExampleEntityDto entities = 1;
+}
+
+message UpdateDto {
+  int64 id = 1;
+  string name = 2;
+  string content = 3;
+}
+
+message DeleteDto {
+  int64 id = 1;
+}
+
+message ExampleEntityDto {
+  int64 id = 1;
+  string name = 2;
+  string content = 3;
+}
+
+message EmptyDto {}

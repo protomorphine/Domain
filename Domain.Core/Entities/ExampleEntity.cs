@@ -1,8 +1,7 @@
 ﻿namespace Domain.Core.Entities;
 
-public class ExampleEntity
+public class ExampleEntity : Entity<long>
 {
-    public long Id { get; set; }
     public string Name { get; set; }
     public string Content { get; set; }
 }
