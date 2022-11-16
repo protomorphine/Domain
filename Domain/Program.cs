@@ -1,7 +1,7 @@
 using Domain.Core.Mapper;
-using Domain.Core.Services;
 using Domain.Extensions;
 using Domain.Infrastructure.Data;
+using Domain.Interceptors;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -17,22 +17,23 @@ var logger = new LoggerConfiguration()
     .ReadFrom.Configuration(config)
     .CreateLogger();
 
-builder
-    .Configuration.AddConfiguration(config);
+builder.Configuration.AddConfiguration(config);
 
 builder.Host.UseSerilog(logger);
 
-// Additional configuration is required to successfully run gRPC on macOS.
-// For instructions on how to configure Kestrel and gRPC clients on macOS, visit https://go.microsoft.com/fwlink/?linkid=2099682
-
 // Add services to the container.
-builder.Services.AddGrpc();
+builder.Services.AddGrpc(options =>
+{
+    options.Interceptors.Add<ApiKeyInterceptor>();
+});
 
 var appSettings = builder.Configuration.GetSection("AppSettings").Get<AppSettings>();
 var dbOptions = appSettings.DbOptions;
+var apiKeyOptions = appSettings.ApiKeyOptions;
 
-builder.Services.AddScoped(_ => appSettings);
-builder.Services.AddScoped(_ => dbOptions);
+builder.Services.AddScoped(_ => appSettings)
+    .AddScoped(_ => dbOptions)
+    .AddScoped(_ => apiKeyOptions);
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
@@ -46,11 +47,9 @@ builder.Services.AddAutoMapper(typeof(DefaultProfile));
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-
-app.MapGrpcService<ExampleService>();
+app.AddGrpcServices();
 app.MapGet("/",
     () =>
-        "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
+        "Communication with gRPC endpoints must be made through a gRPC client.");
 
 app.Run();

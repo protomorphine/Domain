@@ -1,37 +1,41 @@
 ﻿namespace Domain.Core.Repositories;
 
 /// <summary>
-/// Базовый репозиторий
+/// Base CRUD repository
 /// </summary>
-/// <typeparam name="TEntity">сущность</typeparam>
-/// <typeparam name="TId">тип идентификатора сущности в бд</typeparam>
+/// <typeparam name="TEntity">entity</typeparam>
+/// <typeparam name="TId">entity id type</typeparam>
 public interface IBaseRepository<TEntity, TId>
 {
     /// <summary>
-    /// Метод создания сущности в бд
+    /// Create new entry in database
     /// </summary>
-    /// <param name="entity">сущность</param>
-    /// <returns>идентфиикатор сущности</returns>
+    /// <param name="entity">entity</param>
+    /// <returns>entity id</returns>
     Task<TId> CreateAsync(TEntity entity);
 
     /// <summary>
-    /// Метод обновления сущности в бд
+    /// Update entity in database
     /// </summary>
-    /// <param name="entity">сущность</param>
+    /// <param name="entity">entity</param>
     Task UpdateAsync(TEntity entity);
 
     /// <summary>
-    /// Метод удаления сущности из бд
+    /// Delete entity from database
     /// </summary>
-    /// <param name="entity">сущность</param>
+    /// <param name="entity">entity</param>
     Task DeleteAsync(TEntity entity);
 
     /// <summary>
-    /// Метод поулчения сущноси из бд
+    /// Get entity from database by id
     /// </summary>
-    /// <param name="id">идентификатор сущности</param>
-    /// <returns>сущность</returns>
+    /// <param name="id">entity id</param>
+    /// <returns>entity</returns>
     Task<TEntity?> GetAsync(TId id);
 
+    /// <summary>
+    /// Gets list of entities from database
+    /// </summary>
+    /// <returns>list of entities</returns>
     Task<List<TEntity>> GetAllAsync();
 }

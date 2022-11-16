@@ -4,6 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Domain.Infrastructure.Data.Configuration;
 
+/// <summary>
+/// Configure database table for <see cref="ExampleEntity"/>
+/// </summary>
 public class ExampleEntityConfig : IEntityTypeConfiguration<ExampleEntity>
 {
     public void Configure(EntityTypeBuilder<ExampleEntity> builder)

@@ -6,36 +6,47 @@ namespace Domain.Infrastructure.Data;
 
 public class AppDbContext : DbContext
 {
+    #region Fields
+
     /// <summary>
-    /// Строка подключения к базе данных
+    /// Database connection string
     /// </summary>
     private readonly string? _connectionString;
 
     /// <summary>
-    /// Коллекция сущностей - пользователь
+    /// Set of entities
     /// </summary>
-    public DbSet<ExampleEntity> Entities { get; set; }
+    public DbSet<ExampleEntity>? Entities { get; set; }
+
+    #endregion
+
+    #region Contructors
 
     /// <summary>
-    /// Создает новый экземпляр <see cref="AppDbContext"/>
+    /// Create new instance of <see cref="AppDbContext"/>
     /// </summary>
     /// <param name="options"><see cref="DbContextOptions"/></param>
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-    {
-    }
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     /// <summary>
-    /// Создает новый экземпляр <see cref="ApplicationDbContext"/>
+    /// Create new instance of <see cref="AppDbContext"/>
     /// </summary>
-    /// <param name="connectionString">Строка подключения к базе данных</param>
-    public AppDbContext(string connectionString)
-    {
-        _connectionString = connectionString;
-    }
+    /// <param name="connectionString">database connection string</param>
+    public AppDbContext(string connectionString) => _connectionString = connectionString;
 
+    #endregion
+
+    #region Methods
+
+    /// <summary>
+    /// <inheritdoc />
+    /// </summary>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
+
+    #endregion
+
 }

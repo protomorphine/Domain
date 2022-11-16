@@ -10,31 +10,37 @@ public class BaseRepository<TEntity, T, TContext> : IBaseRepository<TEntity, T>
     where TEntity : class, IEntity<T>
     where TContext : AppDbContext
 {
+    #region Fields
+
     /// <summary>
-    /// Сет сущностей
+    /// Entity collection
     /// </summary>
     private readonly DbSet<TEntity> _entities;
 
     /// <summary>
-    /// Контекст бд
+    /// Database context
     /// </summary>
     private readonly TContext _dbContext;
 
+    #endregion
+
+    #region Constructors
+
     /// <summary>
-    /// Создает новый экземпляр <see cref="BaseRepository{TEntity,T,TContext}"/>
+    /// Create new instance of <see cref="BaseRepository{TEntity,T,TContext}"/>
     /// </summary>
-    /// <param name="dbContext">Контекст бд</param>
+    /// <param name="dbContext">database context</param>
     protected BaseRepository(TContext dbContext)
     {
         _entities = dbContext.Set<TEntity>();
         _dbContext = dbContext;
     }
 
-    /// <summary>
-    /// Метод создания сущности в бд
-    /// </summary>
-    /// <param name="entity">сущность</param>
-    /// <returns>идентфиикатор сущности</returns>
+    #endregion
+
+    #region Methods
+
+    /// <inheritdoc />
     public virtual async Task<T> CreateAsync(TEntity entity)
     {
         await _entities.AddAsync(entity);
@@ -43,39 +49,27 @@ public class BaseRepository<TEntity, T, TContext> : IBaseRepository<TEntity, T>
         return entity.Id;
     }
 
-    /// <summary>
-    /// Метод обновления сущности в бд
-    /// </summary>
-    /// <param name="entity">сущность</param>
+    /// <inheritdoc />
     public virtual async Task UpdateAsync(TEntity entity)
     {
         _entities.Update(entity);
         await _dbContext.SaveChangesAsync();
     }
 
-    /// <summary>
-    /// Метод удаления сущности из бд
-    /// </summary>
-    /// <param name="entity">сущность</param>
+    /// <inheritdoc />
     public virtual async Task DeleteAsync(TEntity entity)
     {
         _entities.Remove(entity);
         await _dbContext.SaveChangesAsync();
     }
 
-    /// <summary>
-    /// Метод поулчения сущноси из бд
-    /// </summary>
-    /// <param name="id">идентификатор сущности</param>
-    /// <returns>сущность</returns>
+    /// <inheritdoc />
     public virtual async Task<TEntity?> GetAsync(T id)
-    {
-        // ReSharper disable once HeapView.PossibleBoxingAllocation
-        return await _entities.FirstOrDefaultAsync(it => it.Id!.Equals(id));
-    }
+        => await _entities.FirstOrDefaultAsync(it => it.Id!.Equals(id));
 
+    /// <inheritdoc />
     public async Task<List<TEntity>> GetAllAsync()
-    {
-        return await _entities.ToListAsync();
-    }
+        => await _entities.ToListAsync();
+
+    #endregion
 }
