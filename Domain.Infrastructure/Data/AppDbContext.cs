@@ -38,13 +38,52 @@ public class AppDbContext : DbContext
 
     #region Methods
 
-    /// <summary>
     /// <inheritdoc />
-    /// </summary>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+    }
+
+    /// <inheritdoc />
+    public override int SaveChanges() => SaveChangesAsync().GetAwaiter().GetResult();
+
+    /// <inheritdoc />
+    public override async Task<int> SaveChangesAsync(CancellationToken ct = default)
+    {
+        AddCreatedUpdatedAt();
+        return await base.SaveChangesAsync(ct).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Add CreatedAt and UpdatedAt to entries
+    /// </summary>
+    private void AddCreatedUpdatedAt()
+    {
+        var entries = ChangeTracker.Entries();
+        var now = DateTime.UtcNow;
+
+        foreach (var entry in entries)
+        {
+            switch (entry.State)
+            {
+                case EntityState.Added:
+                    entry.Property("CreatedAt").CurrentValue = now;
+                    entry.Property("UpdatedAt").CurrentValue = now;
+                    break;
+                case EntityState.Modified:
+                    entry.Property("UpdatedAt").CurrentValue = now;
+                    break;
+                case EntityState.Detached:
+                    break;
+                case EntityState.Unchanged:
+                    break;
+                case EntityState.Deleted:
+                    break;
+                default:
+                    continue;
+            }
+        }
     }
 
     #endregion

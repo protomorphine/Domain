@@ -1,10 +1,14 @@
+using Domain.Core.Exceptions;
 using Domain.Core.Mapper;
 using Domain.Extensions;
 using Domain.Infrastructure.Data;
 using Domain.Interceptors;
 using Domain.Models;
+using Grpc.Core;
+using GrpcExceptionsMapping.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using System.Diagnostics.Tracing;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,7 +25,15 @@ builder.Configuration.AddConfiguration(config);
 
 builder.Host.UseSerilog(logger);
 
-// Add services to the container.
+builder.Services.AddGrpcExceptionMapping(options =>
+{
+    options.Map<ObjectNotFoundException>(StatusCode.NotFound);
+    options.Map<NotImplementedException>(StatusCode.Unimplemented);
+    options.Map<DbUpdateConcurrencyException>(StatusCode.Cancelled);
+});
+
+builder.Services.UseGrpcExceptionMapping();
+
 builder.Services.AddGrpc(options =>
 {
     options.Interceptors.Add<ApiKeyInterceptor>();

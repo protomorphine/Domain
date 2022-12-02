@@ -65,11 +65,11 @@ public class BaseRepository<TEntity, T, TContext> : IBaseRepository<TEntity, T>
 
     /// <inheritdoc />
     public virtual async Task<TEntity?> GetAsync(T id)
-        => await _entities.FirstOrDefaultAsync(it => it.Id!.Equals(id));
+        => await _entities.AsNoTracking().FirstOrDefaultAsync(it => it.Id!.Equals(id));
 
     /// <inheritdoc />
     public async Task<List<TEntity>> GetAllAsync()
-        => await _entities.ToListAsync();
+        => await _entities.AsNoTracking().ToListAsync();
 
     #endregion
 }

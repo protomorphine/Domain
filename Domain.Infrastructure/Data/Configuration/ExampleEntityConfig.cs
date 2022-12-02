@@ -13,5 +13,8 @@ public class ExampleEntityConfig : IEntityTypeConfiguration<ExampleEntity>
     {
         builder.ToTable("example_entities");
         builder.HasKey(it => it.Id);
+
+        builder.Property(it => it.UpdatedAt)
+            .IsConcurrencyToken();
     }
 }

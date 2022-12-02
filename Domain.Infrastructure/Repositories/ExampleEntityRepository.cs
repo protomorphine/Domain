@@ -15,7 +15,7 @@ public class ExampleEntityRepository : BaseRepository<ExampleEntity, long, AppDb
     private readonly DbSet<ExampleEntity> _exampleEntities;
 
     #endregion
-    
+
     #region Constrictors
 
     /// <summary>
@@ -29,5 +29,5 @@ public class ExampleEntityRepository : BaseRepository<ExampleEntity, long, AppDb
 
     #endregion
 
-    public async Task<long> GetCount() => await _exampleEntities.CountAsync();
+    public async Task<long> GetCount() => await _exampleEntities.AsNoTracking().CountAsync();
 }

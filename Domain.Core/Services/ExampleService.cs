@@ -51,14 +51,14 @@ public class ExampleService : Example.ExampleBase
     /// <param name="request">data to create entity</param>
     /// <param name="context">gRPC context</param>
     /// <returns>DTO of created entity</returns>
-    public override async Task<ExampleEntityDto> CreateAsync(CreateDto request, ServerCallContext context)
+    public override async Task<ExampleEntityReply> CreateAsync(CreateRequest request, ServerCallContext context)
     {
         var entity = _mapper.Map<ExampleEntity>(request);
         await _exampleEntityRepository.CreateAsync(entity);
 
         _logger.LogInformation("Entity with id {Id} was successfully created", entity!.Id);
 
-        return _mapper.Map<ExampleEntityDto>(entity);
+        return _mapper.Map<ExampleEntityReply>(entity);
     }
 
     /// <summary>
@@ -67,11 +67,11 @@ public class ExampleService : Example.ExampleBase
     /// <param name="request">data to update entity</param>
     /// <param name="context">gRPC context</param>
     /// <returns>DTO of updated entity</returns>
-    public override async Task<ExampleEntityDto> UpdateAsync(UpdateDto request, ServerCallContext context)
+    public override async Task<ExampleEntityReply> UpdateAsync(UpdateRequest request, ServerCallContext context)
     {
         var entity = await _exampleEntityRepository.GetAsync(request.Id);
 
-        entity.ThrowRpcEntityNotFoundIfNull($"Entity with id = {request.Id} not found.");
+        entity.ThrowObjectNotFoundIfNull($"Entity with id = {request.Id} not found.");
 
         var updated = _mapper.Map(request, entity);
 
@@ -79,7 +79,7 @@ public class ExampleService : Example.ExampleBase
 
         _logger.LogInformation("Entity with id {Id} was successfully updated", entity!.Id);
 
-        return _mapper.Map<ExampleEntityDto>(updated);
+        return _mapper.Map<ExampleEntityReply>(updated);
     }
 
     /// <summary>
@@ -88,13 +88,13 @@ public class ExampleService : Example.ExampleBase
     /// <param name="request">entity id</param>
     /// <param name="context">gRPC context</param>
     /// <returns>DTO of requested entity</returns>
-    public override async Task<ExampleEntityDto> GetAsync(Int64Value request, ServerCallContext context)
+    public override async Task<ExampleEntityReply> GetAsync(Int64Value request, ServerCallContext context)
     {
         var entity = await _exampleEntityRepository.GetAsync(request.Value);
 
-        entity.ThrowRpcEntityNotFoundIfNull($"Entity with id = {request.Value} not found.");
+        entity.ThrowObjectNotFoundIfNull($"Entity with id = {request.Value} not found.");
 
-        return _mapper.Map<ExampleEntityDto>(entity);
+        return _mapper.Map<ExampleEntityReply>(entity);
     }
 
     /// <summary>
@@ -103,12 +103,12 @@ public class ExampleService : Example.ExampleBase
     /// <param name="request">empty request<see cref="Empty"/></param>
     /// <param name="context">gRPC context</param>
     /// <returns>List of entities</returns>
-    public override async Task<EntityListDto> GetAllAsync(Empty request, ServerCallContext context)
+    public override async Task<EntityListReply> GetAllAsync(Empty request, ServerCallContext context)
     {
         var entities = await _exampleEntityRepository.GetAllAsync();
 
-        var reply = new EntityListDto {Count = await _exampleEntityRepository.GetCount()};
-        reply.Entities.AddRange(entities.Select(it => _mapper.Map<ExampleEntityDto>(it)));
+        var reply = new EntityListReply {Count = await _exampleEntityRepository.GetCount()};
+        reply.Entities.AddRange(entities.Select(it => _mapper.Map<ExampleEntityReply>(it)));
         return reply;
     }
 
@@ -122,7 +122,7 @@ public class ExampleService : Example.ExampleBase
     {
         var entity = await _exampleEntityRepository.GetAsync(request.Value);
 
-        entity.ThrowRpcEntityNotFoundIfNull($"Entity with id = {request.Value} not found.");
+        entity.ThrowObjectNotFoundIfNull($"Entity with id = {request.Value} not found.");
 
         await _exampleEntityRepository.DeleteAsync(entity!);
 
